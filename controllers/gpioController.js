@@ -5,18 +5,13 @@ var Gpio = require('onoff').Gpio;
 function blinkLED(req, res) {
 
     var gpioParameter = req.params.gpio;
-
+    var pulseParameter = req.params.pulse;
     var LED = new Gpio(gpioParameter, 'out');
-
-    if (LED.readSync() === 0) {
-        LED.writeSync(1);
-    } else {
-        LED.writeSync(0);
-    }
+    LED.writeSync(pulseParameter);
 
     res.status(200).send({
 
-        message: `GPIO ${gpioParameter} ${LED.readSync()}`,
+        message: `GPIO ${pulseParameter} ${LED.readSync()}`,
         object: null,
         response: true
 
