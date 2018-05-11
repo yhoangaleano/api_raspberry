@@ -5,6 +5,6 @@ var gpioController = require("./../controllers/gpioController");
 
 var api = express.Router();
 
-api.get("/blinkLED/:gpio/:pulse", gpioController.blinkLED);
+api.get("/blinkLED/:pulse", gpioController.blinkLED);
 
 module.exports = api;

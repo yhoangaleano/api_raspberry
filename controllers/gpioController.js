@@ -1,25 +1,28 @@
 'use strict'
 
-var Gpio = require('onoff').Gpio;
+const Raspi = require('raspi-io');
+const five = require('johnny-five');
+const board = new five.Board({
+  io: new Raspi()
+});
+
+const pin24 = new five.Pin(24);
 
 function blinkLED(req, res) {
 
-    var gpioParameter = req.params.gpio;
     var pulseParameter = req.params.pulse;
-    var LED = new Gpio(gpioParameter, 'out');
-    LED.writeSync(pulseParameter);
 
-    console.log(pulseParameter);
+    board.on("ready", function() {
+        
+        five.Pin.write(pin24, pulseParameter);
 
-    if(pulseParameter == 0){
-        LED.unexport();
-    }
+        res.status(200).send({
 
-    res.status(200).send({
+            message: `GPIO 24 ${pulseParameter}`,
+            object: null,
+            response: true
 
-        message: `GPIO ${gpioParameter} ${pulseParameter}`,
-        object: null,
-        response: true
+        });
 
     });
 }
