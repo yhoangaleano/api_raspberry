@@ -30,6 +30,8 @@ function endBlink(req, res) {
 
     var gpioParameter = req.params.gpio;
 
+    LED = new Gpio(gpioParameter, 'out');
+
     clearInterval(blinkInterval);
     LED.writeSync(0);
     LED.unexport();
