@@ -9,6 +9,8 @@ function blinkLED(req, res) {
     var LED = new Gpio(gpioParameter, 'out');
     LED.writeSync(pulseParameter);
 
+    console.log(pulseParameter);
+
     if(pulseParameter == 0){
         LED.unexport();
     }
