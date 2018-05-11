@@ -15,7 +15,7 @@ function blinkLED(req, res) {
 
     res.status(200).send({
 
-        message: `GPIO ${gpioParameter} ${LED.readSync()}`,
+        message: `GPIO ${gpioParameter} ${pulseParameter}`,
         object: null,
         response: true
 
