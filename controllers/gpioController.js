@@ -9,9 +9,13 @@ function blinkLED(req, res) {
     var LED = new Gpio(gpioParameter, 'out');
     LED.writeSync(pulseParameter);
 
+    if(pulseParameter == 0){
+        LED.unexport();
+    }
+
     res.status(200).send({
 
-        message: `GPIO ${pulseParameter} ${LED.readSync()}`,
+        message: `GPIO ${gpioParameter} ${LED.readSync()}`,
         object: null,
         response: true
 
