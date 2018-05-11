@@ -22,6 +22,14 @@ app.use((req, res, next) => {
 //Cargo las rutas con las que quiero trabajar
 var gpioRoute = require("./routes/gpioRoute");
 
+app.get("/prueba", function(req, res){
+
+    res.status(200).send({
+        mensaje: "Bienvenido al API"
+    });
+
+});
+
 //Aplico las rutas con las que quiero trabajar
 app.use("/api", gpioRoute);
 
