@@ -1,15 +1,12 @@
 'use strict'
 
 var Gpio = require('onoff').Gpio;
-var LED;
-var blinkInterval;
 
 function blinkLED(req, res) {
 
     var gpioParameter = req.params.gpio;
 
-    LED = new Gpio(gpioParameter, 'out');
-    blinkInterval = setInterval(blinkLED, 250);
+    var LED = new Gpio(gpioParameter, 'out');
 
     if (LED.readSync() === 0) {
         LED.writeSync(1);
@@ -19,26 +16,7 @@ function blinkLED(req, res) {
 
     res.status(200).send({
 
-        message: `GPIO ${gpioParameter} encendido`,
-        object: null,
-        response: true
-
-    });
-}
-
-function endBlink(req, res) {
-
-    var gpioParameter = req.params.gpio;
-
-    LED = new Gpio(gpioParameter, 'out');
-
-    clearInterval(blinkInterval);
-    LED.writeSync(0);
-    LED.unexport();
-
-    res.status(200).send({
-
-        message: `GPIO ${gpioParameter} apagado`,
+        message: `GPIO ${gpioParameter} ${LED.readSync()}`,
         object: null,
         response: true
 
@@ -46,6 +24,5 @@ function endBlink(req, res) {
 }
 
 module.exports = {
-    blinkLED,
-    endBlink
+    blinkLED
 }
