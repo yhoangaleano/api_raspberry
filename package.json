@@ -1,0 +1,20 @@
+{
+    "name": "api_raspberry",
+    "version": "1.0.0",
+    "description": "API Restful con node, express, mysql y jwt",
+    "main": "index.js",
+    "scripts": {
+        "start": "nodemon index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Yhoan Galeano",
+    "license": "MIT",
+    "dependencies": {
+        "body-parser": "^1.17.2",
+        "express": "^4.15.3",
+        "onoff": "^3.0.2"
+    },
+    "devDependencies": {
+        "nodemon": "^1.11.0"
+    }
+}
