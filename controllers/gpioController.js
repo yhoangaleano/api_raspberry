@@ -6,7 +6,7 @@ const board = new five.Board({
   io: new Raspi()
 });
 
-const pin18 = new five.Pin(18);
+var pin18 = new five.Led('P1-18');
 
 function blinkLED(req, res) {
 
