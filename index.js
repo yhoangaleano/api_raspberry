@@ -20,7 +20,6 @@ var board = new five.Board({
 board.on("ready", function() { // Once the computer is connected to the Arduino
     // Save convenient references to the LED pin and an analog pin
     var LEDpin = new five.Pin(13);
-    var analogPin = new five.Pin('A0');
 
     var express = require('express'); // Load the library we'll use to set up a basic webserver
     var app = express(); // And start up that server
@@ -36,7 +35,6 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
     app.get('/:pin/state', function(req, res) { // what happens when someone goes to `/#/state`, where # is any number
         console.log("Someone asked for the state of pin", req.params.pin + "…");
         var pins = {
-            'analog': analogPin,
             'led': LEDpin
         };
         if (pins.hasOwnProperty(req.params.pin)) { // If our pins dictionary knows about the pin name requested
