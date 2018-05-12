@@ -19,7 +19,7 @@ var board = new five.Board({
 
 board.on("ready", function() { // Once the computer is connected to the Arduino
     // Save convenient references to the LED pin and an analog pin
-    var LEDpin = new five.Pin(18);
+    var LEDpin = new five.Pin(13);
     var analogPin = new five.Pin('A0');
 
     var express = require('express'); // Load the library we'll use to set up a basic webserver
