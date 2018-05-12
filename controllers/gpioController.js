@@ -6,7 +6,7 @@ const board = new five.Board({
   io: new Raspi()
 });
 
-var pin18 = new five.Led('P1-18');
+const pin13 = new five.Pin(13);
 
 function blinkLED(req, res) {
 
@@ -14,11 +14,11 @@ function blinkLED(req, res) {
 
     board.on("ready", function() {
         
-        five.Pin.write(pin18, pulseParameter);
+        five.Pin.write(pin13, pulseParameter);
 
         res.status(200).send({
 
-            message: `GPIO 24 - Pin 18 ${pulseParameter}`,
+            message: `GPIO 27 - Pin 13 ${pulseParameter}`,
             object: null,
             response: true
 
