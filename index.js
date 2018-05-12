@@ -34,9 +34,13 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
 
     app.get('/:pin/state', function(req, res) { // what happens when someone goes to `/#/state`, where # is any number
         console.log("Someone asked for the state of pin", req.params.pin + "…");
+        
         var pins = {
             'led': LEDpin
         };
+
+        console.log(pins);
+
         if (pins.hasOwnProperty(req.params.pin)) { // If our pins dictionary knows about the pin name requested
             pins[req.params.pin].query(function(state) { // Look up the pin object associated with the pin name and query it
                 res.send(state); // sending back whatever the state we get is
