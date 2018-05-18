@@ -14,12 +14,13 @@
 var Raspi = require('raspi-io');
 var five = require('johnny-five');
 var board = new five.Board({
-  io: new Raspi()
+    io: new Raspi()
 });
 
 board.on("ready", function() { // Once the computer is connected to the Arduino
     // Save convenient references to the LED pin and an analog pin
     var LEDpin = new five.Pin(2);
+    var PWM0pin = new five.Pin(1);
 
     var express = require('express'); // Load the library we'll use to set up a basic webserver
     var app = express(); // And start up that server
@@ -34,9 +35,10 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
 
     app.get('/:pin/state', function(req, res) { // what happens when someone goes to `/#/state`, where # is any number
         console.log("Someone asked for the state of pin", req.params.pin + "…");
-        
+
         var pins = {
-            'led': LEDpin
+            'led': LEDpin,
+            'pwm0': PWM0pin
         };
 
         console.log(pins);
@@ -45,8 +47,7 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
             pins[req.params.pin].query(function(state) { // Look up the pin object associated with the pin name and query it
                 res.send(state); // sending back whatever the state we get is
             });
-        }
-        else {
+        } else {
             var errorMessage = "Sorry, you asked for the state of pin `" + req.params.pin + '`, ' + "but I haven't been told about that pin yet.";
             res.send(errorMessage);
         }
@@ -62,6 +63,25 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
         console.log("Someone told me to turn the led on…");
         LEDpin.high(); // Set the pin referred to by the `LEDpin` variable 'high' (on)
         res.send("Now the LED for pin 13 should be on.") // And tell the user that it should be off in the webpage
+    });
+
+    app.get('/pwm/brightness/:brightness', function(req, res) {
+
+        const brightness = req.params.brightness;
+
+        console.log("Someone told me to turn the led brightness: " + brightness);
+        PWM0pin.brightness(brightness); // Set the pin referred to by the `LEDpin` variable 'high' (on)
+        res.send("Now the GPIO18/PWM0 - Pin 1 (johnny-five) should be brightness " + brightness) // And tell the user that it should be off in the webpage
+    });
+
+    app.get('/pwm/fade/:brightness/:milliseconds', function(req, res) {
+
+        const brightness = req.params.brightness;
+        const milliseconds = req.params.milliseconds;
+
+        console.log("Someone told me to turn the led brightness: " + brightness);
+        led.fade(brightness, milliseconds);
+        res.send("Now the GPIO18/PWM0 - Pin 1 (johnny-five) should be brightness " + brightness) // And tell the user that it should be off in the webpage
     });
 
     app.listen(3000, function() { // Actually turn the server on
