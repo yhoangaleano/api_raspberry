@@ -74,7 +74,7 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
         res.send("Now the GPIO18/PWM0 - Pin 1 (johnny-five) should be brightness " + brightness) // And tell the user that it should be off in the webpage
     });
 
-    app.get('/pwm/fade/:milliseconds', function(req, res) {
+    app.get('/pwm/fade/:brightness/:milliseconds', function(req, res) {
 
         const brightness = req.params.brightness;
         const milliseconds = req.params.milliseconds;
@@ -82,8 +82,8 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
         PWM0pin.fade({
             easing: "linear",
             duration: milliseconds,
-            cuePoints: [0, 0.2, 0.4, 0.6, 0.8, 1],
-            keyFrames: [0, 250, 25, 150, 100, 125],
+            cuePoints: [0, 1],
+            keyFrames: [0, brightness],
             onstop: function() {
                 console.log("Animation stopped");
             }
