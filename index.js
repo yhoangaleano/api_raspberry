@@ -48,7 +48,7 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
             pins[req.params.pin].query(function(state) { // Look up the pin object associated with the pin name and query it
                 res.send({
                     state: state,
-                    pin: pin[req.params.pin]
+                    pin: pins[req.params.pin]
                 }); // sending back whatever the state we get is
             });
         } else {
