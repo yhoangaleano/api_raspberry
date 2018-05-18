@@ -87,7 +87,8 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
             cuePoints: [0, 1],
             keyFrames: [brightnessPrevious, brightness],
             onstop: function() {
-                console.log("Animation stopped");
+                console.log("Animación Terminada: " + brightness);
+                console.log(`Anterior: ${brightnessPrevious}, Ahora: ${brightness}`);
             }
         });
 
