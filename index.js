@@ -83,7 +83,7 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
             easing: "linear",
             duration: milliseconds,
             cuePoints: [0, 0.2, 0.4, 0.6, 0.8, 1],
-            keyFrames: [0, 250, 25, 150, 100, 125],
+            keyFrames: [0, 250, 0, 250, 0, 250],
             onstop: function() {
                 console.log("Animation stopped");
             }
