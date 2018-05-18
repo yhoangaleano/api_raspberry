@@ -89,10 +89,9 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
             }
         });
 
-        // Toggle the led after 2 seconds (shown in ms)
-        this.wait(milliseconds + 1000, function() {
+        setTimeout(() => {
             PWM0pin.fadeOut();
-        });
+        }, milliseconds + 1000);
 
         // console.log("Someone told me to turn the led brightness: " + brightness);
         // PWM0pin.fade(brightness, milliseconds, () => {
