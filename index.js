@@ -46,7 +46,10 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
 
         if (pins.hasOwnProperty(req.params.pin)) { // If our pins dictionary knows about the pin name requested
             pins[req.params.pin].query(function(state) { // Look up the pin object associated with the pin name and query it
-                res.send(state); // sending back whatever the state we get is
+                res.send({
+                    state: state,
+                    pin: pin[req.params.pin]
+                }); // sending back whatever the state we get is
             });
         } else {
             var errorMessage = "Sorry, you asked for the state of pin `" + req.params.pin + '`, ' + "but I haven't been told about that pin yet.";
