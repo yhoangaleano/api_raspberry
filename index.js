@@ -80,7 +80,7 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
         const milliseconds = req.params.milliseconds;
 
         console.log("Someone told me to turn the led brightness: " + brightness);
-        led.fade(brightness, milliseconds);
+        PWM0pin.fade(brightness, milliseconds);
         res.send("Now the GPIO18/PWM0 - Pin 1 (johnny-five) should be brightness " + brightness) // And tell the user that it should be off in the webpage
     });
 
