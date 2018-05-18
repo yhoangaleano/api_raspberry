@@ -21,6 +21,7 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
     // Save convenient references to the LED pin and an analog pin
     var LEDpin = new five.Pin(2);
     var PWM0pin = new five.Led(1);
+    var brightnessPrevious = 0;
 
     var express = require('express'); // Load the library we'll use to set up a basic webserver
     var app = express(); // And start up that server
@@ -78,15 +79,13 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
 
         let brightness = req.params.brightness;
         const milliseconds = req.params.milliseconds;
-
-        console.log(PWM0pin);
         brightness = +brightness;
 
         PWM0pin.fade({
             easing: "linear",
             duration: milliseconds,
             cuePoints: [0, 1],
-            keyFrames: [0, brightness],
+            keyFrames: [brightnessPrevious, brightness],
             onstop: function() {
                 console.log("Animation stopped");
             }
@@ -94,6 +93,7 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
 
         setTimeout(() => {
             PWM0pin.fadeOut();
+            brightnessPrevious = brightness;
         }, milliseconds + 1000);
 
         // console.log("Someone told me to turn the led brightness: " + brightness);
