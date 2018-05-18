@@ -82,8 +82,8 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
         PWM0pin.fade({
             easing: "linear",
             duration: milliseconds,
-            cuePoints: [0, 0.2, 0.4, 0.6, 0.8, 1],
-            keyFrames: [0, 250, 0, 250, 0, 250],
+            cuePoints: [0, 1],
+            keyFrames: [0, 250],
             onstop: function() {
                 console.log("Animation stopped");
             }
