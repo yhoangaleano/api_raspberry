@@ -17,11 +17,12 @@ var board = new five.Board({
     io: new Raspi()
 });
 
+var brightnessPrevious = 0;
+
 board.on("ready", function() { // Once the computer is connected to the Arduino
     // Save convenient references to the LED pin and an analog pin
     var LEDpin = new five.Pin(2);
     var PWM0pin = new five.Led(1);
-    var brightnessPrevious = 0;
 
     var express = require('express'); // Load the library we'll use to set up a basic webserver
     var app = express(); // And start up that server
