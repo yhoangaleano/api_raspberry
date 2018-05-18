@@ -79,6 +79,9 @@ board.on("ready", function() { // Once the computer is connected to the Arduino
         let brightness = req.params.brightness;
         const milliseconds = req.params.milliseconds;
 
+        console.log(brightness);
+        brightness = +brightness;
+
         PWM0pin.fade({
             easing: "linear",
             duration: milliseconds,
