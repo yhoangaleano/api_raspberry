@@ -1,111 +1,198 @@
 'use strict'
 
-// var app = require('./app');
-
-// var port = process.env.port || 3977;
-// var host = process.env.host || '127.0.0.1';
-
-// var server = app.listen(port, host, function() {
-
-//     console.log("Servidor del API Restful corriendo por http://localhost:3977");
-
-// });
-
+//Declaración de instancias de las librarías para trabajar
 var Raspi = require('raspi-io');
 var five = require('johnny-five');
+
+//Creación de la tarjeta y libreria de soporte de la versión 2
 var board = new five.Board({
     io: new Raspi()
 });
 
-var brightnessPrevious = 0;
+//Tabla de pines segun la raspberry y la librería de Johnny Five
+//https://github.com/nebrius/raspi-io/wiki/Pin-Information
 
-board.on("ready", function() { // Once the computer is connected to the Arduino
-    // Save convenient references to the LED pin and an analog pin
-    var LEDpin = new five.Pin(2);
-    var PWM0pin = new five.Led(1);
+//Cuando la tarjeta esta lista se ejecuta el metodo donde
+//tendremos los metodos del API
+board.on("ready", function() {
+    
+    //GPIO4 - PIN Fisico 7 - Johnny Five 7
+    var pin7 = new five.Pin(7);
 
-    var express = require('express'); // Load the library we'll use to set up a basic webserver
-    var app = express(); // And start up that server
+    //GPIO17 - PIN Fisico 11 - Johnny Five 0
+    var pin11 = new five.Pin(0);
 
-    app.get('/', function(req, res) { // what happens when we go to `/`
-        res.send("Hello from `server.js`!"); // Just send some text
+    //GPIO27 - PIN Fisico 13 - Johnny Five 2
+    var pin13 = new five.Pin(2);
+
+    //GPIO22 - PIN Fisico 15 - Johnny Five 3
+    var pin15 = new five.Pin(3);
+
+    //GPIO18/PWM0 - PIN Fisico 12 - Johnny Five 1
+    // var pin1 = new five.Led(1);
+
+    //Librería para crear las rutas del api
+    var express = require('express');
+    var bodyParser = require('body-parser');
+
+    //Instancia de la clase express
+    var app = express();
+    
+    app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+    app.use(bodyParser.json({ limit: '50mb' }));
+    
+    app.use((req, res, next) => {
+    
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method");
+        res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        res.header("Allow", "GET, POST, PUT, DELETE, OPTIONS");
+    
+        next();
+    
+    });
+    
+    app.get('/', function(req, res) {
+        res.send("Hola, bienvenido a tu casa domotizada!");
     });
 
-    app.get('/hello', function(req, res) { // what ha1ppens when we go to `/hello`
-        res.sendFile('hello.html', { root: '.' }); // Send back the file `hello.html` located in the current directory (`root`)
-    });
+    //Metodo que me retorna el estado del pin (0 apagado - 1 prendido)
+    app.get('/state/:pin', function(req, res) {
 
-    app.get('/:pin/state', function(req, res) { // what happens when someone goes to `/#/state`, where # is any number
-        console.log("Someone asked for the state of pin", req.params.pin + "…");
+        console.log("Alguien preguntó por el estado del pin: ", req.params.pin);
 
+        //Listado de pines disponibles para trabajar
         var pins = {
-            'led': LEDpin,
-            'pwm0': PWM0pin
+            'pin7': pin7,
+            'pin11': pin11,
+            'pin13': pin13,
+            'pin15': pin15
         };
 
-        console.log(pins);
+        //Condición que pregunta si el pin que se esta pidiendo por petición existe y esta disponible en el listado de pines
 
-        if (pins.hasOwnProperty(req.params.pin)) { // If our pins dictionary knows about the pin name requested
-            pins[req.params.pin].query(function(state) { // Look up the pin object associated with the pin name and query it
-                res.send(state); // sending back whatever the state we get is
+        if (pins.hasOwnProperty(req.params.pin)) {
+
+            //Buscar el objeto pin asociado al nombre del pin y consultarlo
+            pins[req.params.pin].query(function(state) { 
+                
+                //Envia el estado en el que se encuentra el pin
+                var respuesta = {
+                    resultado: true,
+                    objeto: state,
+                    mensaje: 'El estado del pin: ' + req.params.pin + ' fue devuelto con exito.'
+                };
+
+                res.status(200).send(respuesta);
             });
+
         } else {
-            var errorMessage = "Sorry, you asked for the state of pin `" + req.params.pin + '`, ' + "but I haven't been told about that pin yet.";
-            res.send(errorMessage);
+
+            var respuesta = {
+                resultado: false,
+                objeto: null,
+                mensaje: "Lo siento, has preguntado por el estado del pin: " + req.params.pin + ", pero aún no esta disponible"
+            };
+
+            res.status(404).send(respuesta);
         }
     });
 
-    app.get('/led/off', function(req, res) { // what happens when someone goes to `/led/off`
-        console.log("Someone told me to turn the led off…");
-        LEDpin.low(); // Set the pin referred to by the `LEDpin` variable 'low' (off)
-        res.send("Now the LED for pin 13 should be off."); // And tell the user that it should be off in the webpage
+    // Metodo para apagar un pin que llega por parametro
+    app.get('/led/off/:pin', function(req, res) {
+
+        console.log("Apagando el pin: ", req.params.pin);
+
+        var existePin = true;
+
+        switch (req.params.pin) {
+            case 'pin7':
+                // Apaga el pin 7 (fisico)
+                pin7.low();
+            break;
+
+            case 'pin11':
+                // Apaga el pin 11 (fisico)
+                pin11.low();
+            break;
+
+            case 'pin13':
+                // Apaga el pin 13 (fisico)
+                pin13.low();
+            break;
+
+            case 'pin15':
+                // Apaga el pin 15 (fisico)
+                pin15.low();
+            break;
+        
+            default:
+                existePin = false;
+            break;
+        }
+
+        var respuesta = {
+            resultado: existePin,
+            objeto: null,
+            mensaje : existePin ? 'El pin: ' + req.params.pin + ' se apago correctamente.' : 'El pin: ' + req.params.pin + ' no existe. Intente de nuevo.'
+        };
+
+        var estado = existePin ? 200 : 404;
+
+        res.status(estado).send(respuesta);
+
     });
 
-    app.get('/led/on', function(req, res) { // what happens when someone goes to `/led/off`
-        console.log("Someone told me to turn the led on…");
-        LEDpin.high(); // Set the pin referred to by the `LEDpin` variable 'high' (on)
-        res.send("Now the LED for pin 13 should be on.") // And tell the user that it should be off in the webpage
+    // Metodo para prender un pin que llega por parametro
+    app.get('/led/on/:pin', function(req, res) {
+
+        console.log("Prendiendo el pin: ", req.params.pin);
+
+        var existePin = true;
+
+        switch (req.params.pin) {
+            case 'pin7':
+                // Apaga el pin 7 (fisico)
+                pin7.high();
+            break;
+
+            case 'pin11':
+                // Apaga el pin 11 (fisico)
+                pin11.high();
+            break;
+
+            case 'pin13':
+                // Apaga el pin 13 (fisico)
+                pin13.high();
+            break;
+
+            case 'pin15':
+                // Apaga el pin 15 (fisico)
+                pin15.high();
+            break;
+        
+            default:
+                existePin = false;
+            break;
+        }
+
+        var respuesta = {
+            resultado: existePin,
+            objeto: null,
+            mensaje : existePin ? 'El pin: ' + req.params.pin + ' se prendio correctamente.' : 'El pin: ' + req.params.pin + ' no existe. Intente de nuevo.'
+        };
+
+        var estado = existePin ? 200 : 404;
+
+        res.status(estado).send(respuesta);
+
     });
 
-    app.get('/pwm/brightness/:brightness', function(req, res) {
 
-        const brightness = req.params.brightness;
-
-        console.log("Someone told me to turn the led brightness: " + brightness);
-        PWM0pin.brightness(brightness); // Set the pin referred to by the `LEDpin` variable 'high' (on)
-        res.send("Now the GPIO18/PWM0 - Pin 1 (johnny-five) should be brightness " + brightness) // And tell the user that it should be off in the webpage
+    //Metodo para correr la aplicación
+    app.listen(3000, function() { 
+        console.log("Servidor Corriendo por la siguiente dirección http://localhost:3000!");
     });
-
-    app.get('/pwm/fade/:brightness/:milliseconds', function(req, res) {
-
-        let brightness = req.params.brightness;
-        const milliseconds = req.params.milliseconds;
-        brightness = +brightness;
-
-        PWM0pin.fade({
-            easing: "linear",
-            duration: milliseconds,
-            cuePoints: [0, 1],
-            keyFrames: [brightnessPrevious, brightness],
-            onstop: function() {
-                console.log("Animación Terminada: " + brightness);
-                console.log(`Anterior: ${brightnessPrevious}, Ahora: ${brightness}`);
-            }
-        });
-
-        setTimeout(() => {
-            PWM0pin.fadeOut();
-            brightnessPrevious = brightness;
-        }, milliseconds + 1000);
-
-        // console.log("Someone told me to turn the led brightness: " + brightness);
-        // PWM0pin.fade(brightness, milliseconds, () => {
-        //     PWM0pin.stop();
-        // });
-        res.send("Now the GPIO18/PWM0 - Pin 1 (johnny-five) should be brightness " + brightness) // And tell the user that it should be off in the webpage
-    });
-
-    app.listen(3000, function() { // Actually turn the server on
-        console.log("Server's up at http://localhost:3000!");
-    });
+    
 });
