@@ -28,6 +28,14 @@ board.on("ready", function() {
     //GPIO22 - PIN Fisico 15 - Johnny Five 3
     var pin15 = new five.Pin(3);
 
+    //Listado de pines disponibles para trabajar
+    var pins = {
+        'pin7': pin7,
+        'pin11': pin11,
+        'pin13': pin13,
+        'pin15': pin15
+    };
+
     //GPIO18/PWM0 - PIN Fisico 12 - Johnny Five 1
     // var pin1 = new five.Led(1);
 
@@ -61,14 +69,6 @@ board.on("ready", function() {
     app.get('/state/:pin', function(req, res) {
 
         console.log("Alguien preguntó por el estado del pin: ", req.params.pin);
-
-        //Listado de pines disponibles para trabajar
-        var pins = {
-            'pin7': pin7,
-            'pin11': pin11,
-            'pin13': pin13,
-            'pin15': pin15
-        };
 
         //Condición que pregunta si el pin que se esta pidiendo por petición existe y esta disponible en el listado de pines
 
@@ -104,88 +104,56 @@ board.on("ready", function() {
 
         console.log("Apagando el pin: ", req.params.pin);
 
-        var existePin = true;
-
-        switch (req.params.pin) {
-            case 'pin7':
-                // Apaga el pin 7 (fisico)
-                pin7.low();
-            break;
-
-            case 'pin11':
-                // Apaga el pin 11 (fisico)
-                pin11.low();
-            break;
-
-            case 'pin13':
-                // Apaga el pin 13 (fisico)
-                pin13.low();
-            break;
-
-            case 'pin15':
-                // Apaga el pin 15 (fisico)
-                pin15.low();
-            break;
-        
-            default:
-                existePin = false;
-            break;
-        }
-
         var respuesta = {
-            resultado: existePin,
+            resultado: true,
             objeto: null,
-            mensaje : existePin ? 'El pin: ' + req.params.pin + ' se apago correctamente.' : 'El pin: ' + req.params.pin + ' no existe. Intente de nuevo.'
+            mensaje: ""
         };
 
-        var estado = existePin ? 200 : 404;
+        if (pins.hasOwnProperty(req.params.pin)) {
 
-        res.status(estado).send(respuesta);
+            //Buscar el objeto pin asociado al nombre del pin y apagarlo
+            pins[req.params.pin].low(); 
+                
+            //Envia la respuesta de que se apago correctamente
+            respuesta.mensaje = 'El pin: ' + req.params.pin + ' se apago correctamente.';
+            res.status(200).send(respuesta);
+    
+        } else {
+
+            respuesta.resultado = false;
+            respuesta.mensaje = 'El pin: ' + req.params.pin + ' no existe. Intente de nuevo.';
+            res.status(404).send(respuesta);
+        }
 
     });
 
     // Metodo para prender un pin que llega por parametro
     app.get('/led/on/:pin', function(req, res) {
-
+       
         console.log("Prendiendo el pin: ", req.params.pin);
 
-        var existePin = true;
-
-        switch (req.params.pin) {
-            case 'pin7':
-                // Apaga el pin 7 (fisico)
-                pin7.high();
-            break;
-
-            case 'pin11':
-                // Apaga el pin 11 (fisico)
-                pin11.high();
-            break;
-
-            case 'pin13':
-                // Apaga el pin 13 (fisico)
-                pin13.high();
-            break;
-
-            case 'pin15':
-                // Apaga el pin 15 (fisico)
-                pin15.high();
-            break;
-        
-            default:
-                existePin = false;
-            break;
-        }
-
         var respuesta = {
-            resultado: existePin,
+            resultado: true,
             objeto: null,
-            mensaje : existePin ? 'El pin: ' + req.params.pin + ' se prendio correctamente.' : 'El pin: ' + req.params.pin + ' no existe. Intente de nuevo.'
+            mensaje: ""
         };
 
-        var estado = existePin ? 200 : 404;
+        if (pins.hasOwnProperty(req.params.pin)) {
 
-        res.status(estado).send(respuesta);
+            //Buscar el objeto pin asociado al nombre del pin y prenderlo
+            pins[req.params.pin].high(); 
+                
+            //Envia la respuesta de que se prendio correctamente
+            respuesta.mensaje = 'El pin: ' + req.params.pin + ' se prendio correctamente.';
+            res.status(200).send(respuesta);
+    
+        } else {
+
+            respuesta.resultado = false;
+            respuesta.mensaje = 'El pin: ' + req.params.pin + ' no existe. Intente de nuevo.';
+            res.status(404).send(respuesta);
+        }
 
     });
 
