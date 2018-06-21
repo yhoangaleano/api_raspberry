@@ -2,8 +2,37 @@
 
 //Declaración de instancias de las librarías para trabajar
 var Raspi = require('raspi-io');
-const pwm = require('raspi-pwm');
 var five = require('johnny-five');
+
+const RaspiPWM = require('raspi');
+const pwm = require('raspi-pwm');
+
+raspi.init(() => {
+  const led = new pwm.PWM('GPIO22');
+  led.write(0.5); // 50% Duty Cycle, aka half brightness
+});
+
+//Librería para crear las rutas del api
+var express = require('express');
+var bodyParser = require('body-parser');
+
+//Instancia de la clase express
+var app = express();
+
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+app.use(bodyParser.json({ limit: '50mb' }));
+
+app.use((req, res, next) => {
+
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Allow", "GET, POST, PUT, DELETE, OPTIONS");
+
+    next();
+
+});
 
 //Creación de la tarjeta y libreria de soporte de la versión 2
 var board = new five.Board({
@@ -15,8 +44,8 @@ var board = new five.Board({
 
 //Cuando la tarjeta esta lista se ejecuta el metodo donde
 //tendremos los metodos del API
-board.on("ready", function() {
-    
+board.on("ready", function () {
+
     //GPIO4 - PIN Fisico 7 - Johnny Five 7
     var pin7 = new five.Pin(7);
 
@@ -40,39 +69,12 @@ board.on("ready", function() {
     //GPIO18/PWM0 - PIN Fisico 12 - Johnny Five 1
     // var pin1 = new five.Led(1);
 
-    //Librería para crear las rutas del api
-    var express = require('express');
-    var bodyParser = require('body-parser');
-
-    //Instancia de la clase express
-    var app = express();
-    
-    app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-
-    app.use(bodyParser.json({ limit: '50mb' }));
-    
-    app.use((req, res, next) => {
-    
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Headers", "Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method");
-        res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        res.header("Allow", "GET, POST, PUT, DELETE, OPTIONS");
-    
-        next();
-    
-    });
-    
-    app.get('/', function(req, res) {
+    app.get('/', function (req, res) {
         res.send("Hola, bienvenido a tu casa domotizada!");
     });
 
-    app.get('/pwm/:brightness', function(req, res) {
-        const led = new pwm.PWM('GPIO22');
-        led.write(req.params.brightness); // 50% Duty Cycle, aka half brightness
-    });
-
     //Metodo que me retorna el estado del pin (0 apagado - 1 prendido)
-    app.get('/state/:pin', function(req, res) {
+    app.get('/state/:pin', function (req, res) {
 
         console.log("Alguien preguntó por el estado del pin: ", req.params.pin);
 
@@ -81,8 +83,8 @@ board.on("ready", function() {
         if (pins.hasOwnProperty(req.params.pin)) {
 
             //Buscar el objeto pin asociado al nombre del pin y consultarlo
-            pins[req.params.pin].query(function(state) { 
-                
+            pins[req.params.pin].query(function (state) {
+
                 //Envia el estado en el que se encuentra el pin
                 var respuesta = {
                     resultado: true,
@@ -106,7 +108,7 @@ board.on("ready", function() {
     });
 
     // Metodo para apagar un pin que llega por parametro
-    app.get('/led/off/:pin', function(req, res) {
+    app.get('/led/off/:pin', function (req, res) {
 
         console.log("Apagando el pin: ", req.params.pin);
 
@@ -119,12 +121,12 @@ board.on("ready", function() {
         if (pins.hasOwnProperty(req.params.pin)) {
 
             //Buscar el objeto pin asociado al nombre del pin y apagarlo
-            pins[req.params.pin].low(); 
-                
+            pins[req.params.pin].low();
+
             //Envia la respuesta de que se apago correctamente
             respuesta.mensaje = 'El pin: ' + req.params.pin + ' se apago correctamente.';
             res.status(200).send(respuesta);
-    
+
         } else {
 
             respuesta.resultado = false;
@@ -135,8 +137,8 @@ board.on("ready", function() {
     });
 
     // Metodo para prender un pin que llega por parametro
-    app.get('/led/on/:pin', function(req, res) {
-       
+    app.get('/led/on/:pin', function (req, res) {
+
         console.log("Prendiendo el pin: ", req.params.pin);
 
         var respuesta = {
@@ -148,12 +150,12 @@ board.on("ready", function() {
         if (pins.hasOwnProperty(req.params.pin)) {
 
             //Buscar el objeto pin asociado al nombre del pin y prenderlo
-            pins[req.params.pin].high(); 
-                
+            pins[req.params.pin].high();
+
             //Envia la respuesta de que se prendio correctamente
             respuesta.mensaje = 'El pin: ' + req.params.pin + ' se prendio correctamente.';
             res.status(200).send(respuesta);
-    
+
         } else {
 
             respuesta.resultado = false;
@@ -163,10 +165,21 @@ board.on("ready", function() {
 
     });
 
+});
 
-    //Metodo para correr la aplicación
-    app.listen(3000, function() { 
-        console.log("Servidor Corriendo por la siguiente dirección http://localhost:3000!");
+RaspiPWM.init(() => {
+    
+
+    app.get('/pwm/:brightness', function (req, res) {
+        const led = new pwm.PWM('GPIO22');
+        led.write(req.params.brightness); // 50% Duty Cycle, aka half brightness
     });
     
+
+});
+
+
+//Metodo para correr la aplicación
+app.listen(3000, function () {
+    console.log("Servidor Corriendo por la siguiente dirección http://localhost:3000!");
 });
