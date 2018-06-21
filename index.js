@@ -2,6 +2,7 @@
 
 //Declaración de instancias de las librarías para trabajar
 var Raspi = require('raspi-io');
+const pwm = require('raspi-pwm');
 var five = require('johnny-five');
 
 //Creación de la tarjeta y libreria de soporte de la versión 2
@@ -63,6 +64,11 @@ board.on("ready", function() {
     
     app.get('/', function(req, res) {
         res.send("Hola, bienvenido a tu casa domotizada!");
+    });
+
+    app.get('/pwm/:brightness', function(req, res) {
+        const led = new pwm.PWM('GPIO22');
+        led.write(req.params.brightness); // 50% Duty Cycle, aka half brightness
     });
 
     //Metodo que me retorna el estado del pin (0 apagado - 1 prendido)
