@@ -183,14 +183,14 @@ board.on("ready", function () {
 
             console.log(tiempoDisparo);
 
-            var valorCruce = state.value;
-            if (valorCruce == 1) {
+            // var valorCruce = state.value;
+            // if (valorCruce == 1) {
                 pin26.low();
                 setTimeout(function () {
                     console.log('Ejecuto Delay', tiempoDisparo);
                     pin26.high();
                 }, tiempoDisparo);
-            }
+            // }
 
         });
 
