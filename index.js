@@ -168,15 +168,37 @@ board.on("ready", function () {
 
         luminosidad = req.params.brillo;
 
-        //Envia el estado en el que se encuentra el pin
-        var respuesta = {
-            resultado: true,
-            objeto: req.params.brillo,
-            mensaje: 'El brillo se modifico: ' + req.params.brillo + '.'
-        };
+        do {
 
-        res.status(200).send(respuesta);
+            console.log(luminosidad);
 
+            var tiempoDisparo = 8.33 - luminosidad * 8.33 / 100;
+            tiempoDisparo = tiempoDisparo / 1000;
+
+            //Buscar el objeto pin asociado al nombre del pin y consultarlo
+            pin18.query(function (state) {
+
+                var valorCruce = state.value;
+                if (valorCruce == 1) {
+                    pin7.low();
+                    setTimeout(function () {
+                        console.log('Ejecuto Delay', tiempoDisparo);
+                        pin7.high();
+                    }, tiempoDisparo);
+                }
+
+            });
+
+            //Envia el estado en el que se encuentra el pin
+            var respuesta = {
+                resultado: true,
+                objeto: req.params.brillo,
+                mensaje: 'El brillo se modifico: ' + req.params.brillo + '.'
+            };
+
+            res.status(200).send(respuesta);
+
+        } while (continuarCiclo);
 
     });
 
@@ -184,28 +206,5 @@ board.on("ready", function () {
     app.listen(3000, function () {
         console.log("Servidor Corriendo por la siguiente dirección http://localhost:3000!");
     });
-
-    do {
-
-        console.log(luminosidad);
-
-        var tiempoDisparo = 8.33 - luminosidad * 8.33 / 100;
-        tiempoDisparo = tiempoDisparo / 1000;
-
-        //Buscar el objeto pin asociado al nombre del pin y consultarlo
-        pin18.query(function (state) {
-
-            var valorCruce = state.value;
-            if(valorCruce == 1){
-                pin7.low();
-                setTimeout(function () {
-                    console.log('Ejecuto Delay', tiempoDisparo);
-                    pin7.high();
-                }, tiempoDisparo);
-            }
-
-        });
-
-    } while (continuarCiclo);
 
 });
