@@ -13,7 +13,7 @@ var SerialPort = require('serialport')
 var Readline = SerialPort.parsers.Readline
 
 var serialPort = new SerialPort('/dev/ttyACM1', {
-    baudrate: 9600
+    baudRate: 9600
 });
 
 var parser = new Readline()
