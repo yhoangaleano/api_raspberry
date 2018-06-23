@@ -12,7 +12,7 @@ var board = new five.Board({
 var SerialPort = require('serialport')
 var Readline = SerialPort.parsers.Readline
 
-var serialPort = new SerialPort('/dev/ttyACM0', {
+var serialPort = new SerialPort('/dev/ttyACM1', {
     baudrate: 9600
 });
 
