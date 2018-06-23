@@ -9,8 +9,22 @@ var board = new five.Board({
     io: new Raspi()
 });
 
-var luminosidad = 0;
-var continuarCiclo = true;
+var SerialPort = require('serialport')
+var Readline = SerialPort.parsers.Readline
+
+var serialPort = new SerialPort('/dev/ttyACM0', {
+    baudrate: 9600
+});
+
+var parser = new Readline()
+serialPort.pipe(parser)
+parser.on('data', function (data) {
+    console.log('data received: ' + data)
+});
+
+serialPort.on('open', function () {
+    console.log('Communication is on!')
+});
 
 //Tabla de pines segun la raspberry y la librería de Johnny Five
 //https://github.com/nebrius/raspi-io/wiki/Pin-Information
@@ -166,35 +180,10 @@ board.on("ready", function () {
 
     });
 
-    // Metodo para prender un pin que llega por parametro
     app.get('/brillo/:brillo', function (req, res) {
+        
+        serialPort.write(req.params.brillo);
 
-        luminosidad = req.params.brillo;
-
-        console.log(luminosidad);
-
-        var tiempoDisparo = 8.33 - luminosidad * 8.33 / 100;
-        tiempoDisparo = tiempoDisparo;
-
-        //Buscar el objeto pin asociado al nombre del pin y consultarlo
-        pin18.query(function (state) {
-
-            console.log(state.value);
-
-            console.log(tiempoDisparo);
-
-            // var valorCruce = state.value;
-            // if (valorCruce == 1) {
-                pin26.low();
-                setTimeout(function () {
-                    console.log('Ejecuto Delay', tiempoDisparo);
-                    pin26.high();
-                }, tiempoDisparo);
-            // }
-
-        });
-
-        //Envia el estado en el que se encuentra el pin
         var respuesta = {
             resultado: true,
             objeto: req.params.brillo,
@@ -202,8 +191,46 @@ board.on("ready", function () {
         };
 
         res.status(200).send(respuesta);
-
     });
+
+    // // Metodo para prender un pin que llega por parametro
+    // app.get('/brillo/:brillo', function (req, res) {
+
+    //     luminosidad = req.params.brillo;
+
+    //     console.log(luminosidad);
+
+    //     var tiempoDisparo = 8.33 - luminosidad * 8.33 / 100;
+    //     tiempoDisparo = tiempoDisparo;
+
+    //     //Buscar el objeto pin asociado al nombre del pin y consultarlo
+    //     pin18.query(function (state) {
+
+    //         console.log(state.value);
+
+    //         console.log(tiempoDisparo);
+
+    //         // var valorCruce = state.value;
+    //         // if (valorCruce == 1) {
+    //             pin26.low();
+    //             setTimeout(function () {
+    //                 console.log('Ejecuto Delay', tiempoDisparo);
+    //                 pin26.high();
+    //             }, tiempoDisparo);
+    //         // }
+
+    //     });
+
+    //     //Envia el estado en el que se encuentra el pin
+    //     var respuesta = {
+    //         resultado: true,
+    //         objeto: req.params.brillo,
+    //         mensaje: 'El brillo se modifico: ' + req.params.brillo + '.'
+    //     };
+
+    //     res.status(200).send(respuesta);
+
+    // });
 
     //Metodo para correr la aplicación
     app.listen(3000, function () {
