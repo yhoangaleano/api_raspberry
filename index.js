@@ -179,6 +179,8 @@ board.on("ready", function () {
         //Buscar el objeto pin asociado al nombre del pin y consultarlo
         pin18.query(function (state) {
 
+            console.log(state.value);
+
             var valorCruce = state.value;
             if (valorCruce == 1) {
                 pin26.low();
