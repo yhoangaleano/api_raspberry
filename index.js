@@ -172,7 +172,7 @@ board.on("ready", function () {
         var respuesta = {
             resultado: true,
             objeto: req.params.brillo,
-            mensaje: 'El brillo se encuentran: ' + req.params.brillo + '.'
+            mensaje: 'El brillo se modifico: ' + req.params.brillo + '.'
         };
 
         res.status(200).send(respuesta);
