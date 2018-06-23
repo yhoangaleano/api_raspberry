@@ -34,6 +34,9 @@ board.on("ready", function () {
     //GPIO24 - PIN Fisico 18 - Johnny Five 5
     var pin18 = new five.Pin(5);
 
+    //GPIO7 - PIN Fisico 26 - Johnny Five 11
+    var pin26 = new five.Pin(11);
+
     //Listado de pines disponibles para trabajar
     var pins = {
         'pin7': pin7,
@@ -178,25 +181,24 @@ board.on("ready", function () {
 
             var valorCruce = state.value;
             if (valorCruce == 1) {
-                pin7.low();
+                pin26.low();
                 setTimeout(function () {
                     console.log('Ejecuto Delay', tiempoDisparo);
-                    pin7.high();
+                    pin26.high();
+
+                    //Envia el estado en el que se encuentra el pin
+                    var respuesta = {
+                        resultado: true,
+                        objeto: req.params.brillo,
+                        mensaje: 'El brillo se modifico: ' + req.params.brillo + '.'
+                    };
+
+                    res.status(200).send(respuesta);
+
                 }, tiempoDisparo);
             }
 
         });
-
-        //Envia el estado en el que se encuentra el pin
-        var respuesta = {
-            resultado: true,
-            objeto: req.params.brillo,
-            mensaje: 'El brillo se modifico: ' + req.params.brillo + '.'
-        };
-
-        res.status(200).send(respuesta);
-
-
 
     });
 
