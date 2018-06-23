@@ -174,7 +174,7 @@ board.on("ready", function () {
         console.log(luminosidad);
 
         var tiempoDisparo = 8.33 - luminosidad * 8.33 / 100;
-        tiempoDisparo = tiempoDisparo / 1000;
+        tiempoDisparo = tiempoDisparo;
 
         //Buscar el objeto pin asociado al nombre del pin y consultarlo
         pin18.query(function (state) {
